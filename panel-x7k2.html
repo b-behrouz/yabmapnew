@@ -988,8 +988,7 @@ function renderTable(shopsData) {
   shops = shopsData; // آپدیت global
   const tbody = document.getElementById('shops-tbody');
   document.getElementById('table-sub').textContent = `${shops.length} مغازه ثبت‌شده`;
-  if (!shops.length) {
-    if (!shopsData || !shopsData.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">
+  if (!shopsData || !shopsData.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">
       <span class="material-icons-round">store_mall_directory</span>
       <p>هنوز طلافروشی‌ای اضافه نشده</p>
     </div></td></tr>`;
