@@ -956,7 +956,12 @@ async function githubGetFile() {
 }
 
 async function githubSaveFile(shops) {
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(shops, null, 2))));
+  const json = JSON.stringify(shops, null, 2);
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(json);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  const content = btoa(binary);
   const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}`, {
     method: 'PUT',
     headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
@@ -1172,7 +1177,10 @@ function openEditModal(id) {
   // نمایش عکس‌های فعلی
   editNewPhotos = [];
   const photoList = document.getElementById('edit-photo-list');
-  const existingPhotos = shop.photos || [];
+  const rawPhotos = shop.photos || '';
+  const existingPhotos = typeof rawPhotos === 'string' 
+    ? rawPhotos.split('\n').filter(l => l.trim().startsWith('http'))
+    : (Array.isArray(rawPhotos) ? rawPhotos : []);
   photoList.innerHTML = existingPhotos.map((url, i) =>
     `<div style="position:relative">
       <img src="${url}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
