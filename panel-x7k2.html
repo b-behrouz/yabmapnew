@@ -459,7 +459,12 @@ body {
     </div>
     <div class="field">
       <label>رمز عبور</label>
-      <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="field" id="token-field" style="display:none">
+      <label>GitHub Token</label>
+      <input type="password" id="inp-token" placeholder="ghp_..." autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+      <p style="font-size:11px;color:var(--on-surface-var);margin-top:4px">فقط یک بار نیاز است — ذخیره می‌شود</p>
     </div>
     <button class="btn btn-primary" onclick="doLogin()" id="login-btn">
       <span class="material-icons-round">login</span>
@@ -692,10 +697,10 @@ body {
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────
-const GITHUB_TOKEN = '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';
 const GITHUB_REPO  = 'b-behrouz/yabmap';
 const GITHUB_FILE  = 'shops.json';
 const RAW_URL      = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/${GITHUB_FILE}`;
+let GITHUB_TOKEN   = localStorage.getItem('gh_token') || '';
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'zarrin1234';
 
@@ -721,6 +726,25 @@ function doLogin() {
   if (!user || !pass) { showToast('نام کاربری و رمز عبور را وارد کنید', 'error'); return; }
 
   if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    // چک کن token داریم
+    const savedToken = localStorage.getItem('gh_token') || '';
+    const inpToken = document.getElementById('inp-token')?.value.trim() || '';
+    
+    if (!savedToken && !inpToken) {
+      // نشون بده فیلد token رو
+      document.getElementById('token-field').style.display = 'block';
+      document.getElementById('login-error').textContent = 'لطفاً GitHub Token را وارد کنید';
+      document.getElementById('login-error').style.display = 'block';
+      return;
+    }
+
+    if (inpToken) {
+      GITHUB_TOKEN = inpToken;
+      localStorage.setItem('gh_token', inpToken);
+    } else {
+      GITHUB_TOKEN = savedToken;
+    }
+
     adminUser = user; adminPass = pass;
     _loginAttempts = 0; _loginLockUntil = 0;
     document.getElementById('login-error').style.display = 'none';
