@@ -927,7 +927,7 @@ async function submitShop() {
     shops = current;
     renderTable(shops);
     renderStats(shops);
-    showToast(lat ? 'طلافروشی با موقعیت روی نقشه اضافه شد ✓' : 'طلافروشی اضافه شد (موقعیت یافت نشد)', 'success');
+    showToast(lat ? 'طلافروشی اضافه شد ✓ — نقشه تا ۶۰ ثانیه آپدیت میشه' : 'طلافروشی اضافه شد (موقعیت یافت نشد)', 'success');
     clearForm();
   } catch(e) {
     showToast('خطا در ذخیره‌سازی: ' + e.message, 'error');
@@ -1359,7 +1359,7 @@ async function confirmDelete() {
     shops = filtered;
     renderTable(shops);
     renderStats(shops);
-    showToast('طلافروشی حذف شد', 'success');
+    showToast('طلافروشی حذف شد ✓ — نقشه تا ۶۰ ثانیه آپدیت میشه', 'success');
     closeModal();
   } catch(e) {
     showToast('خطا در حذف: ' + e.message, 'error');
