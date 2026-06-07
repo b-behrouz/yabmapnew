@@ -2470,7 +2470,7 @@ function autoLocate() {
 }
 
 const SHOPS_CACHE_KEY = 'vimap_shops_cache';
-const SHOPS_CACHE_TTL = 5 * 60 * 1000; // 5 دقیقه
+const SHOPS_CACHE_TTL = 60 * 1000; // 1 دقیقه
 
 /* ── نمایش ساعت کاری ── */
 function renderHoursBlock(hoursStr, isMobile) {
@@ -2527,6 +2527,10 @@ function applyShops(shops) {
 }
 
 const SHOPS_JSON_URL = 'https://raw.githubusercontent.com/b-behrouz/yabmapnew/main/shops.json';
+
+function clearShopsCache() {
+  try { localStorage.removeItem(SHOPS_CACHE_KEY); } catch(e) {}
+}
 
 function fetchShopsFromNetwork() {
   return fetch(SHOPS_JSON_URL + '?t=' + Date.now())
