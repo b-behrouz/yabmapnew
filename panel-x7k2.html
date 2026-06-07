@@ -1241,7 +1241,7 @@ function renderEditHours(hoursStr) {
       if (day !== undefined && val !== undefined) parsed[parseInt(day)] = val;
     });
   }
-  container.innerHTML = DAYS_FA.map((day, i) => {
+  container.innerHTML = DAYS.map((day, i) => {
     const val = parsed[i] || '';
     const isClosed = val === 'تعطیل';
     const [start, end] = isClosed ? ['08:00','20:00'] : (val.split('-').length===2 ? val.split('-') : ['08:00','20:00']);
