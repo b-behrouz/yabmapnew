@@ -443,6 +443,8 @@ body {
   .stats-row { grid-template-columns: repeat(2,1fr); }
 }
 </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -532,9 +534,9 @@ body {
           <label>آدرس کامل <span style="color:var(--error)">*</span></label>
           <div style="display:flex;gap:8px;align-items:center">
             <input type="text" id="f-address" maxlength="200" placeholder="تهران، خیابان...، پلاک ..." style="flex:1" oninput="clearCoords()">
-            <button type="button" onclick="findLocation()" id="find-loc-btn"
+            <button type="button" onclick="openMapPicker()" id="find-loc-btn"
               style="height:48px;padding:0 14px;border-radius:10px;background:#FFF0C8;color:#7A4800;border:1px solid #D4A843;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0">
-              📍 پیدا کن
+              📍 انتخاب از نقشه
             </button>
           </div>
           <div id="geo-status" style="font-size:12px;margin-top:4px;display:none"></div>
@@ -952,7 +954,12 @@ async function githubGetFile() {
   });
   const data = await res.json();
   currentSha = data.sha;
-  return JSON.parse(atob(data.content.replace(/\n/g,'')));
+  // decode درست برای UTF-8 فارسی
+  const b64 = data.content.replace(/\n/g,'');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return JSON.parse(new TextDecoder('utf-8').decode(bytes));
 }
 
 async function githubSaveFile(shops) {
@@ -1370,6 +1377,55 @@ function showToast(msg, type='success') {
   setTimeout(() => t.className = '', 3200);
 }
 
+// ── MAP PICKER ────────────────────────────────────────────────────────
+let pickerMap = null;
+let pickerMarker = null;
+let pickerLat = null;
+let pickerLng = null;
+
+function openMapPicker() {
+  const modal = document.getElementById('map-picker-modal');
+  modal.style.display = 'flex';
+  pickerLat = null; pickerLng = null;
+  document.getElementById('map-picker-confirm').disabled = true;
+
+  setTimeout(() => {
+    if (!pickerMap) {
+      pickerMap = L.map('map-picker-container').setView([36.2972, 59.6067], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
+      pickerMap.on('click', function(e) {
+        pickerLat = e.latlng.lat;
+        pickerLng = e.latlng.lng;
+        if (pickerMarker) pickerMarker.setLatLng(e.latlng);
+        else pickerMarker = L.marker(e.latlng).addTo(pickerMap);
+        document.getElementById('map-picker-confirm').disabled = false;
+      });
+    }
+    pickerMap.invalidateSize();
+  }, 100);
+}
+
+function closeMapPicker() {
+  document.getElementById('map-picker-modal').style.display = 'none';
+}
+
+function confirmMapPicker() {
+  if (!pickerLat || !pickerLng) return;
+  document.getElementById('f-lat').value = pickerLat.toFixed(6);
+  document.getElementById('f-lng').value = pickerLng.toFixed(6);
+  const status = document.getElementById('geo-status');
+  status.style.display = 'block';
+  status.style.color = '#386A20';
+  status.textContent = `✓ موقعیت انتخاب شد: ${pickerLat.toFixed(4)}, ${pickerLng.toFixed(4)}`;
+  closeMapPicker();
+}
+
+function clearCoords() {
+  document.getElementById('f-lat').value = '';
+  document.getElementById('f-lng').value = '';
+  document.getElementById('geo-status').style.display = 'none';
+}
+
 function setLoading(btnId, spinnerId, on) {
   document.getElementById(btnId).disabled = on;
   document.getElementById(spinnerId).style.display = on ? 'block' : 'none';
@@ -1382,5 +1438,23 @@ document.getElementById('inp-pass').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
 });
 </script>
+<!-- Map Picker Modal -->
+<div id="map-picker-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;width:90%;max-width:600px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #eee;direction:rtl">
+      <span style="font-weight:700;font-size:15px">موقعیت فروشگاه را روی نقشه انتخاب کنید</span>
+      <button onclick="closeMapPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#666">✕</button>
+    </div>
+    <div style="padding:8px 16px;background:#FFF8E7;font-size:13px;color:#7A4800;direction:rtl">
+      📍 روی موقعیت فروشگاه کلیک کنید
+    </div>
+    <div id="map-picker-container" style="height:400px"></div>
+    <div style="padding:12px 16px;display:flex;justify-content:flex-end;gap:8px">
+      <button onclick="closeMapPicker()" style="padding:10px 20px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-family:var(--font)">انصراف</button>
+      <button onclick="confirmMapPicker()" id="map-picker-confirm" disabled style="padding:10px 20px;border-radius:8px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-family:var(--font);font-weight:600">تأیید موقعیت</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
