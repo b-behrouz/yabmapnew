@@ -2604,25 +2604,24 @@ function addMarker(shop) {
     </div>` : '';
 
   const popupContent = `
-    <div class="map-popup">
+    <div class="map-popup" style="direction:rtl">
       <div class="map-popup-header">
         <div></div>
         <div class="map-popup-title">
-          <div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px">
             <div class="map-popup-name">${shop.name}</div>
             <span class="shop-type-badge ${TYPE_BADGE[shop.type]}">${TYPE_LABELS[shop.type]}</span>
           </div>
         </div>
       </div>
       ${galleryHtml}
-      ${photos.length ? '' : '<div class="map-popup-divider"></div>'}
-      <div class="map-popup-detail">
+      <div class="map-popup-detail" style="margin-top:12px">
         <span class="material-icons-round">location_on</span>
-        <span style="font-weight:600;color:#1A1916">${shop.address}</span>
+        <span style="font-weight:400;color:#1A1916;flex:1;text-align:right">${shop.address}</span>
       </div>
       <div class="map-popup-detail">
         <span class="material-icons-round">phone</span>
-        <span dir="ltr" style="font-weight:700;color:#1A1916;font-size:15px">${shop.phone}</span>
+        <span style="font-weight:400;color:#1A1916;font-size:15px;flex:1;text-align:right;direction:ltr">${shop.phone}</span>
       </div>
       ${renderHoursBlock(shop.hours, false)}
       <div class="map-popup-actions">
@@ -2709,7 +2708,7 @@ function renderSidebar() {
   }
 
   list.innerHTML = filtered.map(shop => `
-    <div class="shop-card" id="shop-${shop.id}" onclick="selectShop(${shop.id})">
+    <div class="shop-card" id="shop-${shop.id}" onclick="selectShop('${shop.id}')">
       <div class="shop-card-top">
         <div class="shop-name">${shop.name}</div>
         <span class="shop-type-badge ${TYPE_BADGE[shop.type]}">${TYPE_LABELS[shop.type]}</span>
