@@ -2155,7 +2155,7 @@ async function submitSupport() {
   if(!name||!phone||!message){status.style.display='inline';status.style.color='#BA1A1A';status.textContent='همه فیلدها را پر کنید';return;}
   btn.disabled=true;btn.textContent='⏳ ارسال...';status.style.display='none';
   try{
-    await emailjs.send('service_0fbmqye','template_6s6wdql',{name:fullname,phone,message,form_type:'پشتیبانی'});
+    await emailjs.send('service_0fbmqye','template_wk4pp4p',{name:fullname,phone,message,form_type:'پشتیبانی'});
     status.style.display='inline';status.style.color='#386A20';status.textContent='✓ پیام ارسال شد';
     document.getElementById('sup-name').value='';document.getElementById('sup-lastname').value='';document.getElementById('sup-phone').value='';document.getElementById('sup-message').value='';
   }catch(e){status.style.display='inline';status.style.color='#BA1A1A';status.textContent='خطا، دوباره امتحان کنید';}
@@ -2220,7 +2220,7 @@ async function submitRegister() {
   status.textContent = 'در حال ارسال...';
 
   try {
-    await emailjs.send('service_0fbmqye','template_6s6wdql',{name,phone,message:address+(note?'\nتوضیحات: '+note:''),form_type:'ثبت فروشگاه'});
+    await emailjs.send('service_0fbmqye','template_wk4pp4p',{name,phone,message:address+(note?'\nتوضیحات: '+note:''),form_type:'ثبت فروشگاه'});
     status.style.color = '#386A20';
     status.textContent = '✓ درخواست ثبت شد';
     initCaptcha();
